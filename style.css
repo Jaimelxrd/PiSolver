@@ -930,3 +930,66 @@ input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(249,115,22,
   .sys-lbl, .sys-op { font-size: .6rem; }
   .coeff-row { flex-direction: column; align-items: flex-start; }
 }
+#pi-message{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:30px;
+  background:rgba(8,8,16,.95);
+  z-index:999;
+  animation:fadeIn .7s ease;
+}
+
+.pi-msg-text{
+  font-size:clamp(2rem,5vw,4rem);
+  font-family:var(--f-head);
+  color:var(--amber3);
+  letter-spacing:.2em;
+}
+
+#enter-site{
+  background:var(--amber);
+  border:none;
+  padding:14px 36px;
+  font-size:14px;
+  letter-spacing:.2em;
+  cursor:pointer;
+  border-radius:6px;
+  font-family:var(--f-body);
+}
+
+#enter-site:hover{
+  background:var(--amber2);
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:scale(.95)}
+  to{opacity:1;transform:scale(1)}
+}
+#pi-confetti{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:998;
+}
+
+.pi-particle{
+  position:absolute;
+  top:-50px;
+  font-family:var(--f-body);
+  font-size:20px;
+  color:var(--amber3);
+  animation:piFall linear forwards;
+  opacity:.9;
+}
+
+@keyframes piFall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+    opacity:0;
+  }
+}
