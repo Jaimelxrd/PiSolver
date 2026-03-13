@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>π MathLab — Pi Day 3.14</title>
+  <title>πSolver</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800;900&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js"></script>
@@ -12,9 +12,6 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     TELA 1 — CONTAGEM REGRESSIVA
-     ══════════════════════════════════════════ -->
 <div id="screen-countdown">
   <canvas id="bg-canvas"></canvas>
 
@@ -167,7 +164,7 @@
         <!-- Quick tools row -->
         <div class="ov-quick-row">
           <div class="ov-quick-card">
-            <div class="oqc-label">⚡ Cálculo Rápido</div>
+            <div class="oqc-label"> Cálculo Rápido</div>
             <div class="oqc-input-row">
               <input type="text" id="ov-expr" placeholder="ex: (2+3)*4 ou sqrt(81)"/>
               <button onclick="ovCalc()">=</button>
@@ -175,7 +172,7 @@
             <div class="oqc-result" id="ov-result">—</div>
           </div>
           <div class="ov-quick-card">
-            <div class="oqc-label">∿ Gráfico Rápido</div>
+            <div class="oqc-label"> Gráfico Rápido</div>
             <div class="oqc-input-row">
               <input type="text" id="ov-fn" placeholder="ex: sin(x) ou x^2-4"/>
               <button onclick="ovGraph()">▶</button>
