@@ -1,21 +1,5 @@
 'use strict';
-/* ═══════════════════════════════════════════════════
-   π MathLab — script.js
-   Módulos:
-   1. Canvas background
-   2. Slot-machine countdown (2026 → 3.14 em 60s)
-   3. Dashboard navigation
-   4. Operações básicas
-   5. Equações
-   6. Cálculo simbólico
-   7. Gráficos Plotly
-   8. Utilidades
-   ═══════════════════════════════════════════════════ */
 
-
-/* ══════════════════════════════════════════
-   1. CANVAS BACKGROUND — partículas flutuantes
-   ══════════════════════════════════════════ */
 (function bgCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -69,25 +53,14 @@
    2. COUNTDOWN — SLOT MACHINE 2026 → 3.14
    ══════════════════════════════════════════ */
 (function Countdown() {
-  const DURATION = 10; // seconds total
-
-  // Build the sequence: 2026, 2025, ..., 4, 3.14
-  // We need meaningful "stops" spread over 60 seconds.
-  // Total numbers from 2026 down to 4 = 2023 numbers, plus final 3.14
-  // We'll display a subset, animating smoothly:
-  //  - Start at 2026
-  //  - End at 3.14
-  //  - Step decreases as we approach the end (like a slot machine slowing down)
+  const DURATION = 10; 
 
   const track   = document.getElementById('slot-track');
   const barEl   = document.getElementById('cd-bar');
   const timerEl = document.getElementById('cd-timer');
 
-  // Build visible sequence items to slot through
-  // We show numbers from 2026 down with step sizes that compress over time
   const sequence = buildSequence();
 
-  // Populate DOM
   sequence.forEach((val, i) => {
     const el = document.createElement('div');
     el.className = 'slot-num' + (i === 0 ? ' current' : '');
@@ -110,13 +83,13 @@
     return seq;
   }
 
-  const TOTAL_STEPS = sequence.length - 1; // steps to go from index 0 to last
+  const TOTAL_STEPS = sequence.length - 1; 
   let currentIndex = 0;
   let secondsLeft  = DURATION;
   let startTime    = Date.now();
   let launched     = false;
 
-  // Item height: read from CSS (slot mask height)
+
   function getItemH() {
     const mask = document.querySelector('.cd-slot-mask');
     return mask ? mask.offsetHeight : 140;
@@ -127,7 +100,7 @@
     const h = getItemH();
     track.style.transform = `translateY(-${idx * h}px)`;
 
-    // Highlight current
+   
     track.querySelectorAll('.slot-num').forEach((el, i) => {
       el.className = 'slot-num';
       if (i === idx) el.classList.add('current');
@@ -135,7 +108,7 @@
     });
   }
 
-  // Special: 3.14 gets amber3 color
+  
   function highlightPiDay(el) {
     if (el) el.style.color = 'var(--amber3)';
   }
@@ -151,9 +124,6 @@
     const pct = Math.min(100, (elapsed / DURATION) * 100);
     barEl.style.width = pct + '%';
 
-    // Which slot index to show?
-    // Map elapsed (0..60) → index (0..TOTAL_STEPS)
-    // Use easeInQuart so it starts slow and speeds up, then slows down at the end
     const t         = Math.min(1, elapsed / DURATION);
     const eased     = easeInOutCubic(t);
     const targetIdx = Math.round(eased * TOTAL_STEPS);
@@ -164,19 +134,21 @@
     }
 
     if (elapsed >= DURATION) {
-      // Make sure we're on 3.14
-      setSlotIndex(sequence.length - 1);
-      const lastEl = track.querySelectorAll('.slot-num')[sequence.length - 1];
-      highlightPiDay(lastEl);
-      launched = true;
-      setTimeout(launchDashboard, 1200);
-      return;
-    }
+  setSlotIndex(sequence.length - 1);
+
+  const lastEl = track.querySelectorAll('.slot-num')[sequence.length - 1];
+  highlightPiDay(lastEl);
+
+  launched = true;
+
+  showPiMessage();
+
+  return;
+}
 
     requestAnimationFrame(tick);
   }
 
-  // Easing: slow start, fast middle, slow end
   function easeInOutCubic(t) {
     return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -204,6 +176,64 @@
       }));
     }, 720);
   }
+  function showPiMessage() {
+
+  const msg = document.createElement('div');
+  msg.id = "pi-message";
+
+  msg.innerHTML = `
+  <div id="pi-confetti"></div>
+  <div class="pi-msg-text">Happy Pi Day</div>
+  <button id="enter-site">Continuar</button>
+`;
+
+  document.body.appendChild(msg);
+  startPiRain();
+
+  document.getElementById("enter-site").addEventListener("click", () => {
+
+  const msg = document.getElementById("pi-message");
+
+  if(msg){
+    msg.remove(); 
+  }
+
+  launchDashboard();
+
+});
+
+}
+
+function startPiRain(){
+
+  const container = document.getElementById("pi-confetti");
+
+  const symbols = ["π","3.14","π","3.14","π"];
+
+  const interval = setInterval(()=>{
+
+    const particle = document.createElement("div");
+    particle.className = "pi-particle";
+
+    particle.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+
+    particle.style.left = Math.random()*100 + "vw";
+    particle.style.fontSize = (16 + Math.random()*30) + "px";
+    particle.style.animationDuration = (3 + Math.random()*3) + "s";
+
+    container.appendChild(particle);
+
+    setTimeout(()=>{
+      particle.remove();
+    },6000);
+
+  },120);
+
+  setTimeout(()=>{
+    clearInterval(interval);
+  },5000);
+
+}
 })();
 
 
@@ -218,7 +248,7 @@ const PAGE_NAMES = {
   'graph':      'Gráficos',
 };
 
-// Map screen id suffix → display name
+
 const SCREEN_MAP = {
   's-overview':  'overview',
   's-basic':     'basic',
@@ -272,7 +302,7 @@ function initNav() {
   activateScreen('s-overview');
 }
 
-/* ── HAMBURGER (mobile) ── */
+
 function initHamburger() {
   const btn     = document.getElementById('hbg-btn');
   const sidebar = document.getElementById('sidebar');
@@ -359,7 +389,7 @@ function pickOp(op) {
   autoQ();
 }
 
-// Overview calc
+
 function ovCalc() {
   const expr = document.getElementById('ov-expr').value.trim();
   const out  = document.getElementById('ov-result');
