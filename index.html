@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>π MathLab — Pi Day 3.14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TELA 1 — CONTAGEM REGRESSIVA
+     ══════════════════════════════════════════ -->
+<div id="screen-countdown">
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="cd-top-bar">
+    <span class="cd-logo">π Solver</span>
+    <span class="cd-tagline"></span>
+  </div>
+
+  <div class="cd-center">
+    <!-- Números caindo: slot machine style -->
+    <div class="cd-label-top">CONTAGEM REGRESSIVA</div>
+
+    <div class="cd-slot-wrap">
+      <div class="cd-slot-mask">
+        <div class="cd-slot-track" id="slot-track">
+          <!-- Gerado pelo JS -->
+        </div>
+      </div>
+      <div class="cd-slot-glow-top"></div>
+      <div class="cd-slot-glow-bottom"></div>
+    </div>
+
+    <div class="cd-to-piday">
+      <span class="cd-arrow-down">↓</span>
+      <span class="cd-piday-label">πSolver</span>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="cd-bar-outer">
+      <div class="cd-bar-inner" id="cd-bar"></div>
+      <div class="cd-bar-shine"></div>
+    </div>
+
+    <div class="cd-timer-row">
+      <span class="cd-timer-num" id="cd-timer">60</span>
+      <span class="cd-timer-sec">segundos restantes</span>
+    </div>
+  </div>
+
+  <div class="cd-bottom-strip">
+    3 · 1 · 4 · 1 · 5 · 9 · 2 · 6 · 5 · 3 · 5 · 8 · 9 · 7 · 9 · 3 · 2 · 3 · 8 · 4 · 6 · 2 · 6 · 4 · 3 · 3 · 8 · 3 · 2 · 7 · 9 · 5 · 0 · 2 · 8 · 8 · 4 · 1 · 9 · 7 · 1 · 6 · 9 · 3 · 9 · 9 · 3 · 7 · 5 · 1 · 0 …
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     TELA 2 — DASHBOARD
+     ══════════════════════════════════════════ -->
+<div id="screen-dashboard" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo-mark">π</div>
+      <div class="sb-logo-text">
+        <span class="sb-title">πSolver</span>
+        <span class="sb-sub">π 3.14</span>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <button class="sb-btn active" data-screen="s-overview">
+        <span class="sb-ico">⊞</span>
+        <span class="sb-btn-text">Visão Geral</span>
+      </button>
+      <button class="sb-btn" data-screen="s-basic">
+        <span class="sb-ico">±</span>
+        <span class="sb-btn-text">Operações Básicas</span>
+      </button>
+      <button class="sb-btn" data-screen="s-equations">
+        <span class="sb-ico">x²</span>
+        <span class="sb-btn-text">Equações</span>
+      </button>
+      <button class="sb-btn" data-screen="s-calculus">
+        <span class="sb-ico">∫</span>
+        <span class="sb-btn-text">Cálculo Simbólico</span>
+      </button>
+      <button class="sb-btn" data-screen="s-graph">
+        <span class="sb-ico">∿</span>
+        <span class="sb-btn-text">Gráficos</span>
+      </button>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-fact-title">💡 Fato sobre π</div>
+      <div class="sb-fact-body" id="pi-fact">…</div>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="dash-main" id="dash-main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="hbg-btn" id="hbg-btn">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-crumb">
+        <span class="tb-pi">π</span>
+        <span class="tb-sep">/</span>
+        <span class="tb-page" id="tb-page">Visão Geral</span>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Modo de Cor">
+  <div class="bulb-icon">
+    <div class="bulb-glass"></div>
+    <div class="bulb-filament"></div>
+    <div class="bulb-glow"></div>
+  </div>
+</button>
+      <div class="topbar-badge">
+        <span class="tb-live-dot"></span>
+        Pi Solver Ativo
+      </div>
+    </header>
+
+    <!-- Mobile drawer overlay -->
+    <div class="mob-overlay hidden" id="mob-overlay"></div>
+
+    <!-- ─────────── TELA: VISÃO GERAL ─────────── -->
+    <section class="dash-screen active" id="s-overview">
+      <div class="ov-wrap">
+
+        <!-- Hero -->
+        <div class="ov-hero">
+          <div class="ov-hero-bg-pi">π</div>
+          <div class="ov-hero-text">
+            <h1>Sistema Matemático<br/><em>Completo</em></h1>
+            <p>Ferramentas para cálculo, equações, derivadas, integrais e visualização de funções.</p>
+          </div>
+          <div class="ov-hero-nav">
+            <div class="ov-hero-card" onclick="goTo('s-basic')">
+              <span class="ohc-ico">±</span>
+              <span class="ohc-name">Operações<br/>Básicas</span>
+            </div>
+            <div class="ov-hero-card" onclick="goTo('s-equations')">
+              <span class="ohc-ico">x²</span>
+              <span class="ohc-name">Equações</span>
+            </div>
+            <div class="ov-hero-card" onclick="goTo('s-calculus')">
+              <span class="ohc-ico">∫</span>
+              <span class="ohc-name">Cálculo<br/>Simbólico</span>
+            </div>
+            <div class="ov-hero-card" onclick="goTo('s-graph')">
+              <span class="ohc-ico">∿</span>
+              <span class="ohc-name">Gráficos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick tools row -->
+        <div class="ov-quick-row">
+          <div class="ov-quick-card">
+            <div class="oqc-label">⚡ Cálculo Rápido</div>
+            <div class="oqc-input-row">
+              <input type="text" id="ov-expr" placeholder="ex: (2+3)*4 ou sqrt(81)"/>
+              <button onclick="ovCalc()">=</button>
+            </div>
+            <div class="oqc-result" id="ov-result">—</div>
+          </div>
+          <div class="ov-quick-card">
+            <div class="oqc-label">∿ Gráfico Rápido</div>
+            <div class="oqc-input-row">
+              <input type="text" id="ov-fn" placeholder="ex: sin(x) ou x^2-4"/>
+              <button onclick="ovGraph()">▶</button>
+            </div>
+            <div id="ov-graph" class="oqc-graph"></div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="ov-stats-row">
+          <div class="ov-stat"><div class="ost-val">∞</div><div class="ost-lbl">Operações</div></div>
+          <div class="ov-stat"><div class="ost-val">4</div><div class="ost-lbl">Módulos</div></div>
+          <div class="ov-stat"><div class="ost-val">3.14</div><div class="ost-lbl">Pi Day</div></div>
+          <div class="ov-stat"><div class="ost-val">∫∂</div><div class="ost-lbl">Cálculo</div></div>
+        </div>
+
+        <!-- Pi digits -->
+        <div class="ov-pi-card">
+          <div class="opc-label">π — Primeiros 60 dígitos</div>
+          <div class="opc-digits">3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─────────── TELA: OPERAÇÕES BÁSICAS ─────────── -->
+    <section class="dash-screen hidden" id="s-basic">
+      <div class="screen-header">
+        <h2>Operações <em>Básicas</em></h2>
+        <p>Soma · Subtração · Multiplicação · Divisão · Expressões Complexas</p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-label">Expressão Livre</div>
+          <div class="input-row">
+            <input type="text" id="basic-expr" placeholder="ex: (3 + 5) * 2 / sqrt(4)"
+              onkeydown="if(event.key==='Enter')calcBasic()"/>
+            <button class="btn-accent" onclick="calcBasic()">Calcular</button>
+          </div>
+          <div class="chip-row">
+            <span class="chip" onclick="qi('basic-expr','12 + 7 * 3',calcBasic)">12+7×3</span>
+            <span class="chip" onclick="qi('basic-expr','(100-34)/2',calcBasic)">(100-34)/2</span>
+            <span class="chip" onclick="qi('basic-expr','2^10',calcBasic)">2¹⁰</span>
+            <span class="chip" onclick="qi('basic-expr','sqrt(144)',calcBasic)">√144</span>
+            <span class="chip" onclick="qi('basic-expr','pi * 3^2',calcBasic)">π·r²</span>
+            <span class="chip" onclick="qi('basic-expr','log(1000, 10)',calcBasic)">log₁₀(1000)</span>
+          </div>
+          <div class="result hidden" id="basic-result"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Calculadora A ⊕ B</div>
+          <div class="ab-grid">
+            <input type="number" id="q-a" placeholder="A" oninput="autoQ()"/>
+            <div class="op-pad">
+              <button class="op-btn active" id="opbtn-add" onclick="pickOp('+')">+</button>
+              <button class="op-btn" id="opbtn-sub" onclick="pickOp('-')">−</button>
+              <button class="op-btn" id="opbtn-mul" onclick="pickOp('*')">×</button>
+              <button class="op-btn" id="opbtn-div" onclick="pickOp('/')">÷</button>
+            </div>
+            <input type="number" id="q-b" placeholder="B" oninput="autoQ()"/>
+          </div>
+          <div class="result hidden" id="quick-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── TELA: EQUAÇÕES ─────────── -->
+    <section class="dash-screen hidden" id="s-equations">
+      <div class="screen-header">
+        <h2>Resolver <em>Equações</em></h2>
+        <p>1º Grau · Quadráticas · Sistemas Lineares 2×2</p>
+      </div>
+
+      <div class="sub-tabs">
+        <button class="stab active" data-target="eq-lin">1º Grau</button>
+        <button class="stab" data-target="eq-quad">Quadrática</button>
+        <button class="stab" data-target="eq-sys">Sistema 2×2</button>
+      </div>
+
+      <!-- 1º Grau -->
+      <div class="sub-panel active" id="eq-lin">
+        <div class="card">
+          <div class="card-label">ax + b = 0</div>
+          <div class="coeff-row">
+            <div class="cf-group">
+              <input type="number" id="lin-a" value="2" placeholder="a"/>
+              <span class="cf-op">x  +</span>
+            </div>
+            <div class="cf-group">
+              <input type="number" id="lin-b" value="-8" placeholder="b"/>
+              <span class="cf-op">= 0</span>
+            </div>
+            <button class="btn-accent" onclick="solveLinear()">Resolver</button>
+          </div>
+          <div class="result hidden" id="lin-result"></div>
+          <div class="graph-box hidden" id="lin-graph"></div>
+        </div>
+      </div>
+
+      <!-- Quadrática -->
+      <div class="sub-panel hidden" id="eq-quad">
+        <div class="card">
+          <div class="card-label">ax² + bx + c = 0</div>
+          <div class="coeff-row coeff-row--3">
+            <div class="cf-group">
+              <input type="number" id="qa-a" value="1" placeholder="a"/>
+              <span class="cf-op">x²  +</span>
+            </div>
+            <div class="cf-group">
+              <input type="number" id="qa-b" value="-5" placeholder="b"/>
+              <span class="cf-op">x  +</span>
+            </div>
+            <div class="cf-group">
+              <input type="number" id="qa-c" value="6" placeholder="c"/>
+              <span class="cf-op">= 0</span>
+            </div>
+            <button class="btn-accent" onclick="solveQuad()">Resolver</button>
+          </div>
+          <div class="result hidden" id="quad-result"></div>
+          <div class="graph-box hidden" id="quad-graph"></div>
+        </div>
+      </div>
+
+      <!-- Sistema -->
+      <div class="sub-panel hidden" id="eq-sys">
+        <div class="card">
+          <div class="card-label">Sistema Linear 2 × 2</div>
+          <div class="sys-grid">
+            <span class="sys-lbl">Eq.1</span>
+            <input type="number" id="s-a1" value="2" placeholder="a₁"/>
+            <span class="sys-op">x  +</span>
+            <input type="number" id="s-b1" value="3" placeholder="b₁"/>
+            <span class="sys-op">y  =</span>
+            <input type="number" id="s-c1" value="8" placeholder="c₁"/>
+            <span class="sys-lbl">Eq.2</span>
+            <input type="number" id="s-a2" value="5" placeholder="a₂"/>
+            <span class="sys-op">x  −</span>
+            <input type="number" id="s-b2" value="1" placeholder="b₂"/>
+            <span class="sys-op">y  =</span>
+            <input type="number" id="s-c2" value="2" placeholder="c₂"/>
+          </div>
+          <button class="btn-accent mt-1" onclick="solveSystem()">Resolver Sistema</button>
+          <div class="result hidden" id="sys-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── TELA: CÁLCULO ─────────── -->
+    <section class="dash-screen hidden" id="s-calculus">
+      <div class="screen-header">
+        <h2>Cálculo <em>Simbólico</em></h2>
+        <p>Derivadas · Integrais Indefinidas · Integral Numérica Definida</p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-label">d/dx [ f(x) ] — Derivada</div>
+          <div class="input-row">
+            <input type="text" id="deriv-fn" placeholder="x^3 + 2*x^2 - 5*x + 1"
+              onkeydown="if(event.key==='Enter')calcDeriv()"/>
+            <button class="btn-accent" onclick="calcDeriv()">Derivar</button>
+          </div>
+          <div class="chip-row">
+            <span class="chip" onclick="qi('deriv-fn','x^3 + 2*x^2',calcDeriv)">x³+2x²</span>
+            <span class="chip" onclick="qi('deriv-fn','sin(x)',calcDeriv)">sin(x)</span>
+            <span class="chip" onclick="qi('deriv-fn','cos(x)',calcDeriv)">cos(x)</span>
+            <span class="chip" onclick="qi('deriv-fn','e^x',calcDeriv)">eˣ</span>
+            <span class="chip" onclick="qi('deriv-fn','log(x)',calcDeriv)">ln(x)</span>
+            <span class="chip" onclick="qi('deriv-fn','x^2 * sin(x)',calcDeriv)">x²·sin(x)</span>
+          </div>
+          <div class="result hidden" id="deriv-result"></div>
+          <div class="graph-box hidden" id="deriv-graph"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">∫ f(x) dx — Integral</div>
+          <div class="input-row">
+            <input type="text" id="integ-fn" placeholder="x^2 + 3*x - 2"
+              onkeydown="if(event.key==='Enter')calcInteg()"/>
+            <button class="btn-accent" onclick="calcInteg()">Integrar</button>
+          </div>
+          <div class="chip-row">
+            <span class="chip" onclick="qi('integ-fn','x^2',calcInteg)">x²</span>
+            <span class="chip" onclick="qi('integ-fn','sin(x)',calcInteg)">sin(x)</span>
+            <span class="chip" onclick="qi('integ-fn','cos(x)',calcInteg)">cos(x)</span>
+            <span class="chip" onclick="qi('integ-fn','2*x + 5',calcInteg)">2x+5</span>
+            <span class="chip" onclick="qi('integ-fn','e^x',calcInteg)">eˣ</span>
+            <span class="chip" onclick="qi('integ-fn','1/x',calcInteg)">1/x</span>
+          </div>
+          <div class="result hidden" id="integ-result"></div>
+          <div class="def-int-row">
+            <span class="def-label">∫ numérica:</span>
+            <input type="number" id="int-a" value="0" placeholder="a"/>
+            <span>até</span>
+            <input type="number" id="int-b" value="5" placeholder="b"/>
+            <button class="btn-sec" onclick="calcDefinite()">= ?</button>
+          </div>
+          <div class="result hidden" id="def-result"></div>
+          <div class="graph-box hidden" id="integ-graph"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── TELA: GRÁFICOS ─────────── -->
+    <section class="dash-screen hidden" id="s-graph">
+      <div class="screen-header">
+        <h2>Visualização <em>de Funções</em></h2>
+        <p>Gráficos interativos — zoom · pan · até 3 funções simultâneas</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Funções a plotar</div>
+        <div class="graph-fn-inputs">
+          <div class="gfn-row">
+            <span class="gfn-lbl" style="color:var(--c1)">f(x)</span>
+            <input type="text" id="gfn1" placeholder="x^2 - 4*x + 4"
+              onkeydown="if(event.key==='Enter')plotMain()"/>
+          </div>
+          <div class="gfn-row">
+            <span class="gfn-lbl" style="color:var(--c2)">g(x)</span>
+            <input type="text" id="gfn2" placeholder="(opcional)"/>
+          </div>
+          <div class="gfn-row">
+            <span class="gfn-lbl" style="color:var(--c3)">h(x)</span>
+            <input type="text" id="gfn3" placeholder="(opcional)"/>
+          </div>
+        </div>
+        <div class="graph-opts-row">
+          <label class="range-lbl">
+            x de <input type="number" id="x-min" value="-10"/>
+            até  <input type="number" id="x-max" value="10"/>
+          </label>
+          <button class="btn-accent" onclick="plotMain()">Plotar Gráfico</button>
+        </div>
+        <div class="chip-row">
+          <span class="chip" onclick="qp('x^2')">x²</span>
+          <span class="chip" onclick="qp('2*x + 5')">2x+5</span>
+          <span class="chip" onclick="qp('sin(x)')">sin(x)</span>
+          <span class="chip" onclick="qp('cos(x)')">cos(x)</span>
+          <span class="chip" onclick="qp('tan(x)')">tan(x)</span>
+          <span class="chip" onclick="qp('x^3 - 4*x + 1')">x³-4x+1</span>
+          <span class="chip" onclick="qp('sqrt(x)')">√x</span>
+          <span class="chip" onclick="qp('1/x')">1/x</span>
+          <span class="chip" onclick="qp('e^x')">eˣ</span>
+          <span class="chip" onclick="qp('log(x)')">ln(x)</span>
+          <span class="chip" onclick="qp('abs(x)')">|x|</span>
+          <span class="chip" onclick="qp('x^2 * sin(x)')">x²sin(x)</span>
+        </div>
+        <div id="main-graph" class="main-graph-area"></div>
+      </div>
+    </section>
+
+  </div><!-- /dash-main -->
+</div><!-- /dashboard -->
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
